@@ -24,10 +24,7 @@ namespace Meeeeeediator.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Query(string name, [FromBody]string rawQuery)
         {
-            var queryType = typeof(EchoQuery).Assembly.GetTypes().Single(x => x.Name == name);
-            var query = JsonConvert.DeserializeObject(rawQuery, queryType);
-
-            var result = await _mediator.SendAsync(query);
+            var result = await _mediator.SendAsync(name, rawQuery);
 
             return new JsonResult(new { data = result });
         }

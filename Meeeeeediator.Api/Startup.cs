@@ -26,8 +26,7 @@ namespace Meeeeeediator.Api
                 options.InputFormatters.Insert(0, new RawJsonBodyInputFormatter());
             });
 
-            services.AddMediator();
-            services.AddQueryHandlers(typeof(EchoQueryHandler).Assembly);
+            services.AddMediator(typeof(EchoQueryHandler).Assembly);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,16 +1,21 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Meeeeeediator.Core
 {
     public class Mediator : IMediator
     {
         private readonly IServiceProvider _services;
+        private readonly Assembly _queryAssembly;
 
-        public Mediator(IServiceProvider services)
+        public Mediator(IServiceProvider services, Assembly queryAssembly)
         {
             _services = services;
+            _queryAssembly = queryAssembly;
         }
 
         public async Task<TReturn> SendAsync<TReturn>(IQuery<TReturn> query)
@@ -25,7 +30,10 @@ namespace Meeeeeediator.Core
 
         public Task<object> SendAsync(string name, string query)
         {
-            throw new NotImplementedException();
+            // In the real world these types would be stored on Startup
+            var queryType = _queryAssembly.GetTypes().Single(x => x.Name == name);
+            var actualQuery = JsonConvert.DeserializeObject(query, queryType);
+            return SendAsync(actualQuery);
         }
 
         public async Task<object> SendAsync(object query)
@@ -40,7 +48,7 @@ namespace Meeeeeediator.Core
 
             await task.ConfigureAwait(false);
 
-            return (object) ((dynamic) task).Result;
+            return (object)((dynamic)task).Result;
         }
 
         private static object GetHandlerValue(object handler, Type queryType, object query)
@@ -48,7 +56,6 @@ namespace Meeeeeediator.Core
             var method = handler.GetType().GetMethod("HandleAsync", new[] { queryType });
             return method.Invoke(handler, new[] { query });
         }
-
 
         private object GetHandler(Type queryType, Type returnType)
         {

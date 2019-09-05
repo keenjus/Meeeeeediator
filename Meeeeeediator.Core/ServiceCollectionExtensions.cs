@@ -5,12 +5,15 @@ namespace Meeeeeediator.Core
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddMediator(this IServiceCollection services)
+        public static IServiceCollection AddMediator(this IServiceCollection services, Assembly assembly)
         {
-            return services.AddScoped<IMediator, Mediator>();
+            services.AddScoped<IMediator, Mediator>(sp => new Mediator(sp, assembly));
+            services.AddQueryHandlers(assembly);
+
+            return services;
         }
 
-        public static IServiceCollection AddQueryHandlers(this IServiceCollection services, Assembly assembly)
+        private static IServiceCollection AddQueryHandlers(this IServiceCollection services, Assembly assembly)
         {
             foreach (var type in assembly.GetTypes())
             {
