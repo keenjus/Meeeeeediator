@@ -1,3 +1,4 @@
+using Meeeeeediator.Api.Controllers;
 using Meeeeeediator.Api.Queries;
 using Meeeeeediator.Core;
 using Microsoft.AspNetCore.Builder;
@@ -20,7 +21,10 @@ namespace Meeeeeediator.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers(options =>
+            {
+                options.InputFormatters.Insert(0, new RawJsonBodyInputFormatter());
+            });
 
             services.AddMediator();
             services.AddQueryHandlers(typeof(EchoQueryHandler).Assembly);

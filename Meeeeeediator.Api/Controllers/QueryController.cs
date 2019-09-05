@@ -1,7 +1,12 @@
 ﻿using Meeeeeediator.Api.Queries;
 using Meeeeeediator.Core;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Meeeeeediator.Api.Controllers
@@ -20,11 +25,37 @@ namespace Meeeeeediator.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Query()
+        public async Task<IActionResult> Query(string name, [FromBody]string rawQuery)
         {
-            var result = await _mediator.SendAsync(new EchoQuery() { Message = "TEST" });
+            var queryType = typeof(EchoQuery).Assembly.GetTypes().Single(x => x.Name == name);
+            var query = JsonConvert.DeserializeObject(rawQuery, queryType);
+
+            var result = await _mediator.SendAsync(query);
 
             return new JsonResult(new { data = result });
+        }
+    }
+
+    public class RawJsonBodyInputFormatter : InputFormatter
+    {
+        public RawJsonBodyInputFormatter()
+        {
+            this.SupportedMediaTypes.Add("application/json");
+        }
+
+        public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context)
+        {
+            var request = context.HttpContext.Request;
+            using (var reader = new StreamReader(request.Body))
+            {
+                var content = await reader.ReadToEndAsync();
+                return await InputFormatterResult.SuccessAsync(content);
+            }
+        }
+
+        protected override bool CanReadType(Type type)
+        {
+            return type == typeof(string);
         }
     }
 }
