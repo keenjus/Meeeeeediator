@@ -14,7 +14,7 @@ namespace Meeeeeediator.Client.CLI
         {
             Console.WriteLine("Wait for API to initialize");
 
-            Thread.Sleep(4000);
+            Thread.Sleep(4500);
             
             #region Dependency Injection
             var serviceCollection = new ServiceCollection();
