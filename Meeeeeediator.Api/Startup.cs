@@ -1,4 +1,3 @@
-using System.Linq;
 using Meeeeeediator.Api.Queries;
 using Meeeeeediator.Core;
 using Microsoft.AspNetCore.Builder;
