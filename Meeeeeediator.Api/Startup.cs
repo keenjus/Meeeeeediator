@@ -1,4 +1,4 @@
-using Meeeeeediator.Api.Controllers;
+using Meeeeeediator.Api.InputFormatters;
 using Meeeeeediator.Api.Queries;
 using Meeeeeediator.Core;
 using Microsoft.AspNetCore.Builder;

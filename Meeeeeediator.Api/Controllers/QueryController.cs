@@ -1,11 +1,8 @@
 ﻿using Meeeeeediator.Api.Queries;
 using Meeeeeediator.Core;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -33,29 +30,6 @@ namespace Meeeeeediator.Api.Controllers
             var result = await _mediator.SendAsync(query);
 
             return new JsonResult(new { data = result });
-        }
-    }
-
-    public class RawJsonBodyInputFormatter : InputFormatter
-    {
-        public RawJsonBodyInputFormatter()
-        {
-            this.SupportedMediaTypes.Add("application/json");
-        }
-
-        public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context)
-        {
-            var request = context.HttpContext.Request;
-            using (var reader = new StreamReader(request.Body))
-            {
-                var content = await reader.ReadToEndAsync();
-                return await InputFormatterResult.SuccessAsync(content);
-            }
-        }
-
-        protected override bool CanReadType(Type type)
-        {
-            return type == typeof(string);
         }
     }
 }

@@ -17,14 +17,15 @@ namespace Meeeeeediator.Core
         {
             var queryType = query.GetType();
 
-            var handlerType = typeof(IQueryHandler<,>).MakeGenericType(queryType, typeof(TReturn));
+            var handler = GetHandler(queryType, typeof(TReturn));
+            var task = (Task<TReturn>)GetHandlerValue(handler, queryType, query);
 
-            // There has to be a better way to do this, right? Right?!
-            var handler = _services.GetRequiredService(handlerType);
-            var method = handler.GetType().GetMethod("HandleAsync", new[] { queryType });
-            var invoke = method.Invoke(handler, new[] { query });
+            return await task;
+        }
 
-            return await (Task<TReturn>)invoke;
+        public Task<object> SendAsync(string name, string query)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<object> SendAsync(object query)
@@ -34,15 +35,25 @@ namespace Meeeeeediator.Core
             var queryInterface = queryType.GetInterfaces()[0];
             var queryReturnType = queryInterface.GetGenericArguments()[0];
 
-            var handlerType = typeof(IQueryHandler<,>).MakeGenericType(queryType, queryReturnType);
+            var handler = GetHandler(queryType, queryReturnType);
+            var task = (Task)GetHandlerValue(handler, queryType, query);
 
-            // There has to be a better way to do this, right? Right?!
-            var handler = _services.GetRequiredService(handlerType);
+            await task.ConfigureAwait(false);
+
+            return (object) ((dynamic) task).Result;
+        }
+
+        private static object GetHandlerValue(object handler, Type queryType, object query)
+        {
             var method = handler.GetType().GetMethod("HandleAsync", new[] { queryType });
-            var invoke = method.Invoke(handler, new[] { query });
+            return method.Invoke(handler, new[] { query });
+        }
 
-            // TODO: C# does not like this
-            return await (Task<object>)invoke;
+
+        private object GetHandler(Type queryType, Type returnType)
+        {
+            var handlerType = typeof(IQueryHandler<,>).MakeGenericType(queryType, returnType);
+            return _services.GetRequiredService(handlerType);
         }
     }
 
@@ -50,7 +61,10 @@ namespace Meeeeeediator.Core
     {
         Task<TReturn> SendAsync<TReturn>(IQuery<TReturn> query);
 
+        Task<object> SendAsync(string name, string query);
+
         Task<object> SendAsync(object query);
+
     }
 
     public interface IQuery<TReturn>
@@ -58,7 +72,7 @@ namespace Meeeeeediator.Core
 
     }
 
-    public interface IQueryHandler<TQuery, TReturn> where TQuery : IQuery<TReturn>
+    public interface IQueryHandler<in TQuery, TReturn> where TQuery : IQuery<TReturn>
     {
         Task<TReturn> HandleAsync(TQuery query);
     }
