@@ -53,6 +53,7 @@ namespace Meeeeeediator.Core
 
         private static object GetHandlerValue(object handler, Type queryType, object query)
         {
+            // This seems very hacky, probably overcomplicating it?
             var method = handler.GetType().GetMethod("HandleAsync", new[] { queryType });
             return method.Invoke(handler, new[] { query });
         }
@@ -71,16 +72,5 @@ namespace Meeeeeediator.Core
         Task<object> SendAsync(string name, string query);
 
         Task<object> SendAsync(object query);
-
-    }
-
-    public interface IQuery<TReturn>
-    {
-
-    }
-
-    public interface IQueryHandler<in TQuery, TReturn> where TQuery : IQuery<TReturn>
-    {
-        Task<TReturn> HandleAsync(TQuery query);
     }
 }
