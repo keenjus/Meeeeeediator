@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Meeeeeediator.Application\Meeeeeediator.Application.csproj" />
     <ProjectReference Include="..\Meeeeeediator.Core\Meeeeeediator.Core.csproj" />
   </ItemGroup>
 

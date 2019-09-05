@@ -8,11 +8,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0-preview9.19423.4" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.0.0-preview9.19423.4" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Meeeeeediator.Api\Meeeeeediator.Api.csproj" />
+    <ProjectReference Include="..\Meeeeeediator.Application\Meeeeeediator.Application.csproj" />
   </ItemGroup>
 
 </Project>

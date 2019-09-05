@@ -1,6 +1,6 @@
 ﻿using Meeeeeediator.Core;
 
-namespace Meeeeeediator.Api.Queries
+namespace Meeeeeediator.Application.Queries
 {
     public class EchoQuery : IQuery<string>
     {

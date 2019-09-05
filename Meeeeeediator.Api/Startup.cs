@@ -1,5 +1,5 @@
 using Meeeeeediator.Api.InputFormatters;
-using Meeeeeediator.Api.Queries;
+using Meeeeeediator.Application.Queries;
 using Meeeeeediator.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

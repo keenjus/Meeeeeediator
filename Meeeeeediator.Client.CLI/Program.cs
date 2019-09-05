@@ -1,9 +1,10 @@
-﻿using Meeeeeediator.Api.Queries;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Meeeeeediator.Application.Queries;
+using Meeeeeediator.Core;
 
 namespace Meeeeeediator.Client.CLI
 {

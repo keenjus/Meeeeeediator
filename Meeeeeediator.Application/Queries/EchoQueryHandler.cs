@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Meeeeeediator.Core;
 
-namespace Meeeeeediator.Api.Queries
+namespace Meeeeeediator.Application.Queries
 {
     public class EchoQueryHandler : IQueryHandler<EchoQuery, string>
     {

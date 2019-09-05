@@ -2,10 +2,9 @@
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Meeeeeediator.Core;
 using Newtonsoft.Json;
 
-namespace Meeeeeediator.Client.CLI
+namespace Meeeeeediator.Core
 {
     public class ProxyMediator : IProxyMediator
     {
@@ -27,12 +26,12 @@ namespace Meeeeeediator.Client.CLI
 
             var stream = await response.Content.ReadAsStreamAsync();
 
-            using var streamReader = new StreamReader(stream);
-            using var jsonTextReader = new JsonTextReader(streamReader);
-
-            var parsed = _serializer.Deserialize<ResponseWrapper<T>>(jsonTextReader);
-
-            return parsed.Data;
+            using (var streamReader = new StreamReader(stream))
+            using (var jsonTextReader = new JsonTextReader(streamReader))
+            {
+                var parsed = _serializer.Deserialize<ResponseWrapper<T>>(jsonTextReader);
+                return parsed.Data;
+            }
         }
 
         private class ResponseWrapper<T>
