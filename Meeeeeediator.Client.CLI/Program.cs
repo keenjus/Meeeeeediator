@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Meeeeeediator.Client.CLI
@@ -10,6 +11,10 @@ namespace Meeeeeediator.Client.CLI
     {
         static async Task Main(string[] args)
         {
+            Console.WriteLine("Wait for API to initialize");
+
+            Thread.Sleep(5000);
+            
             #region Dependency Injection
             var serviceCollection = new ServiceCollection();
 
@@ -28,6 +33,8 @@ namespace Meeeeeediator.Client.CLI
             string response = await proxyMediator.SendAsync(new EchoQuery() { Message = "Hello World" });
 
             Console.WriteLine(response);
+
+            Console.ReadLine();
         }
     }
 }
