@@ -1,3 +1,6 @@
+using System.Linq;
+using Meeeeeediator.Api.Queries;
+using Meeeeeediator.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +22,9 @@ namespace Meeeeeediator.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddMediator();
+            services.AddQueryHandlers(typeof(EchoQueryHandler).Assembly);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

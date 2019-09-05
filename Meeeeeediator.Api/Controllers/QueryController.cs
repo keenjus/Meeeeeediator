@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Meeeeeediator.Api.Queries;
+using Meeeeeediator.Core;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace Meeeeeediator.Api.Controllers
 {
@@ -8,22 +11,20 @@ namespace Meeeeeediator.Api.Controllers
     public class QueryController : ControllerBase
     {
         private readonly ILogger<QueryController> _logger;
+        private readonly IMediator _mediator;
 
-        public QueryController(ILogger<QueryController> logger)
+        public QueryController(ILogger<QueryController> logger, IMediator mediator)
         {
             _logger = logger;
-        }
-
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return new JsonResult(new { success = true });
+            _mediator = mediator;
         }
 
         [HttpPost]
-        public IActionResult Query()
+        public async Task<IActionResult> Query()
         {
-            return new JsonResult(new { success = true });
+            var result = await _mediator.SendAsync(new EchoQuery() { Message = "TEST" });
+
+            return new JsonResult(new { data = result });
         }
     }
 }
