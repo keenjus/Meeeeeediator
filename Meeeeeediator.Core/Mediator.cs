@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Linq;
-using System.Reflection;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Meeeeeediator.Core.Interfaces;
 using Newtonsoft.Json;
 
 namespace Meeeeeediator.Core
@@ -10,12 +10,12 @@ namespace Meeeeeediator.Core
     public class Mediator : IMediator
     {
         private readonly IServiceProvider _services;
-        private readonly Assembly _queryAssembly;
+        private readonly IDictionary<string, Type> _queryTypeDictionary;
 
-        public Mediator(IServiceProvider services, Assembly queryAssembly)
+        public Mediator(IServiceProvider services, IDictionary<string, Type> queryTypeDictionary)
         {
             _services = services;
-            _queryAssembly = queryAssembly;
+            _queryTypeDictionary = queryTypeDictionary;
         }
 
         public async Task<TReturn> SendAsync<TReturn>(IQuery<TReturn> query)
@@ -30,8 +30,11 @@ namespace Meeeeeediator.Core
 
         public Task<object> SendAsync(string name, string query)
         {
-            // In the real world these types would be stored on Startup
-            var queryType = _queryAssembly.GetTypes().Single(x => x.Name == name);
+            if (!_queryTypeDictionary.TryGetValue(name, out var queryType))
+            {
+                throw new InvalidOperationException($"Invalid query \"{name}\"");
+            }
+
             var actualQuery = JsonConvert.DeserializeObject(query, queryType);
             return SendAsync(actualQuery);
         }
@@ -63,14 +66,5 @@ namespace Meeeeeediator.Core
             var handlerType = typeof(IQueryHandler<,>).MakeGenericType(queryType, returnType);
             return _services.GetRequiredService(handlerType);
         }
-    }
-
-    public interface IMediator
-    {
-        Task<TReturn> SendAsync<TReturn>(IQuery<TReturn> query);
-
-        Task<object> SendAsync(string name, string query);
-
-        Task<object> SendAsync(object query);
     }
 }

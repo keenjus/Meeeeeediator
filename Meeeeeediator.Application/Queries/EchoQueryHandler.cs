@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Meeeeeediator.Core;
+using Meeeeeediator.Core.Interfaces;
 
 namespace Meeeeeediator.Application.Queries
 {

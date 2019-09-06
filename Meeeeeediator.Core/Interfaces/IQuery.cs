@@ -1,4 +1,4 @@
-﻿namespace Meeeeeediator.Core
+﻿namespace Meeeeeediator.Core.Interfaces
 {
     public interface IQuery<TReturn>
     {

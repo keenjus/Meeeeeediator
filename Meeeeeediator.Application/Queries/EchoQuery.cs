@@ -1,4 +1,4 @@
-﻿using Meeeeeediator.Core;
+﻿using Meeeeeediator.Core.Interfaces;
 
 namespace Meeeeeediator.Application.Queries
 {

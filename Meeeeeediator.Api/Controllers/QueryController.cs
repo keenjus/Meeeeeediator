@@ -1,6 +1,6 @@
-﻿using Meeeeeediator.Core;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Meeeeeediator.Core.Interfaces;
 
 namespace Meeeeeediator.Api.Controllers
 {
