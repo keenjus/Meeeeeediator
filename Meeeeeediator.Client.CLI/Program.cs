@@ -32,7 +32,7 @@ namespace Meeeeeediator.Client.CLI
             var proxyMediator = serviceProvider.GetRequiredService<IProxyMediator>();
 
             Console.WriteLine(await proxyMediator.SendAsync(new Application.Queries.EchoQuery() { Message = "Hello World" }));
-            Console.WriteLine(await proxyMediator.SendAsync(new Application.EchoQuery() { Message = "is this uppercase" }));
+            Console.WriteLine(await proxyMediator.SendAsync(new Application.EchoQuery("is this uppercase")));
 
             Console.ReadLine();
         }

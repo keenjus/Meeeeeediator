@@ -9,6 +9,11 @@ namespace Meeeeeediator.Application
     [Query(Name = "EchoQueryV2")]
     public class EchoQuery : IQuery<string>
     {
-        public string Message { get; set; }
+        public EchoQuery(string message)
+        {
+            Message = message;
+        }
+
+        public string Message { get; }
     }
 }
