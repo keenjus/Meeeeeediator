@@ -11,6 +11,6 @@
 # Start the server
 dotnet run -p Meeeeeediator.Api/
 
-# Run basic the client
+# Run the basic client
 dotnet run -p Meeeeeediator.Client.CLI/
 ```
