@@ -4,7 +4,7 @@
 # Getting Started
 
 ## Requirements
-* .NET Core preview 9
+* .NET Core 3 preview 9
 
 ## Running (for demo purposes)
 ```sh
