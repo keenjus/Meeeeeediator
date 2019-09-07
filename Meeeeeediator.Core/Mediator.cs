@@ -28,18 +28,12 @@ namespace Meeeeeediator.Core
             var handler = GetHandler(queryType, typeof(TReturn));
             var handlerDelegate = new QueryHandlerDelegate<TReturn>(() => (Task<TReturn>)GetHandlerResponse(handler, queryType, query));
 
-            var behaviours = GetBehaviors<TReturn>();
+            var behaviors = GetBehaviors<TReturn>();
 
-            if (behaviours.Count > 0)
-            {
-                // No idea how to make this yet
-
-                return await handlerDelegate();
-            }
-            else
-            {
-                return await handlerDelegate();
-            }
+            return await behaviors
+                // Reverse so the order of registering the behaviors makes sense
+                .Reverse()
+                .Aggregate(handlerDelegate, (next, pipeline) => () => pipeline.HandleAsync(query, next))();
         }
 
         public async Task<object> SendAsync(object query)
