@@ -1,12 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Meeeeeediator.Core.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Meeeeeediator.Core.Interfaces;
-using Newtonsoft.Json;
 
 namespace Meeeeeediator.Core
 {
+    public delegate Task<TReturn> QueryHandlerDelegate<TReturn>();
+
     public class Mediator : IMediator
     {
         private readonly IServiceProvider _services;
@@ -23,9 +26,37 @@ namespace Meeeeeediator.Core
             var queryType = query.GetType();
 
             var handler = GetHandler(queryType, typeof(TReturn));
-            var task = (Task<TReturn>)GetHandlerValue(handler, queryType, query);
+            var handlerDelegate = new QueryHandlerDelegate<TReturn>(() => (Task<TReturn>)GetHandlerResponse(handler, queryType, query));
 
-            return await task;
+            var behaviours = GetBehaviors<TReturn>();
+
+            if (behaviours.Count > 0)
+            {
+                // No idea how to make this yet
+
+                return await handlerDelegate();
+            }
+            else
+            {
+                return await handlerDelegate();
+            }
+        }
+
+        public async Task<object> SendAsync(object query)
+        {
+            var queryType = query.GetType();
+
+            var queryInterface = queryType.GetInterfaces()[0];
+            var queryReturnType = queryInterface.GetGenericArguments()[0];
+
+            var handler = GetHandler(queryType, queryReturnType);
+            var handlerDelegate = new QueryHandlerDelegate<object>(async () => {
+                var task = (Task)GetHandlerResponse(handler, queryType, query);
+                await task.ConfigureAwait(false);
+                return (object)((dynamic)task).Result;
+            });
+
+            return await handlerDelegate();
         }
 
         public Task<object> SendAsync(string name, string query)
@@ -39,32 +70,22 @@ namespace Meeeeeediator.Core
             return SendAsync(actualQuery);
         }
 
-        public async Task<object> SendAsync(object query)
+        private ICollection<IBehavior<IQuery<TReturn>, TReturn>> GetBehaviors<TReturn>()
         {
-            var queryType = query.GetType();
-
-            var queryInterface = queryType.GetInterfaces()[0];
-            var queryReturnType = queryInterface.GetGenericArguments()[0];
-
-            var handler = GetHandler(queryType, queryReturnType);
-            var task = (Task)GetHandlerValue(handler, queryType, query);
-
-            await task.ConfigureAwait(false);
-
-            return (object)((dynamic)task).Result;
-        }
-
-        private static object GetHandlerValue(object handler, Type queryType, object query)
-        {
-            // This seems very hacky, probably overcomplicating it?
-            var method = handler.GetType().GetMethod("HandleAsync", new[] { queryType });
-            return method.Invoke(handler, new[] { query });
+            return _services.GetService<IEnumerable<IBehavior<IQuery<TReturn>, TReturn>>>().ToList();
         }
 
         private object GetHandler(Type queryType, Type returnType)
         {
             var handlerType = typeof(IQueryHandler<,>).MakeGenericType(queryType, returnType);
             return _services.GetRequiredService(handlerType);
+        }
+
+        private static object GetHandlerResponse(object handler, Type queryType, object query)
+        {
+            // This seems very hacky, probably overcomplicating it?
+            var method = handler.GetType().GetMethod("HandleAsync", new[] { queryType });
+            return method.Invoke(handler, new[] { query });
         }
     }
 }

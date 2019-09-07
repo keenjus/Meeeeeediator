@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Meeeeeediator.Core.Interfaces;
+using Meeeeeediator.Application;
 
 namespace Meeeeeediator.Api.Controllers
 {
@@ -19,6 +20,12 @@ namespace Meeeeeediator.Api.Controllers
         public async Task<IActionResult> Query(string name, [FromBody]string rawQuery)
         {
             return new JsonResult(new { data = await _mediator.SendAsync(name, rawQuery) });
+        }
+
+        [HttpPost("test")]
+        public async Task<IActionResult> Test()
+        {
+            return new JsonResult(new { data = await _mediator.SendAsync(new EchoQuery("testing behaviors")) });
         }
     }
 }

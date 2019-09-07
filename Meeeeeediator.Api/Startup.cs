@@ -1,6 +1,8 @@
 using Meeeeeediator.Api.InputFormatters;
+using Meeeeeediator.Application.Behaviors;
 using Meeeeeediator.Application.Queries;
 using Meeeeeediator.Core;
+using Meeeeeediator.Core.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +27,10 @@ namespace Meeeeeediator.Api
             {
                 options.InputFormatters.Insert(0, new RawJsonBodyInputFormatter());
             });
+
+            services.AddScoped(typeof(IBehavior<,>), typeof(PerformanceBehavior<,>));
+            services.AddScoped(typeof(IBehavior<,>), typeof(LoggingBehavior<,>));
+            services.AddScoped(typeof(IBehavior<,>), typeof(TestBehavior<,>));
 
             services.AddMediator(typeof(EchoQueryHandler).Assembly);
         }
