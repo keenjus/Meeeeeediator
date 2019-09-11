@@ -28,7 +28,12 @@ namespace Meeeeeediator.Core
             return SendAsync<object>(query);
         }
 
-        public async Task<object> SendAsync(string name, string query)
+        public Task<object> SendAsync(string name, string query)
+        {
+            return SendAsync<object>(name, query);
+        }
+
+        private async Task<T> SendAsync<T>(string name, string query)
         {
             var body = new StringContent(query, Encoding.UTF8, "application/json");
 
@@ -39,13 +44,13 @@ namespace Meeeeeediator.Core
             using var streamReader = new StreamReader(stream);
             using var jsonTextReader = new JsonTextReader(streamReader);
 
-            return _serializer.Deserialize<ResponseWrapper<object>>(jsonTextReader).Data;
+            return _serializer.Deserialize<ResponseWrapper<T>>(jsonTextReader).Data;
         }
 
         private async Task<T> SendAsync<T>(object query)
         {
             string queryName = QueryHelper.GetQueryName(query.GetType());
-            return (T)await SendAsync(queryName, JsonConvert.SerializeObject(query));
+            return await SendAsync<T>(queryName, JsonConvert.SerializeObject(query));
         }
 
         private class ResponseWrapper<T>
