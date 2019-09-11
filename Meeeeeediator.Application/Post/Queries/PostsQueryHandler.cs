@@ -16,7 +16,7 @@ namespace Meeeeeediator.Application.Post.Queries
 
         public async Task<ICollection<Post>> HandleAsync(PostsQuery query)
         {
-            return await _fetcher.GetPosts();
+            return await _fetcher.GetAll();
         }
     }
 }

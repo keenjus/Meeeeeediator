@@ -16,8 +16,7 @@ namespace Meeeeeediator.Application.Post.Queries
 
         public async Task<Post> HandleAsync(PostQuery query)
         {
-            var posts = await _fetcher.GetPosts();
-            return posts.Single(x => x.Id == query.Id);
+            return await _fetcher.GetById(query.Id);
         }
     }
 }

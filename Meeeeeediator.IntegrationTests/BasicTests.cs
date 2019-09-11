@@ -1,22 +1,48 @@
-using Meeeeeediator.Api;
+using System.Linq;
 using Meeeeeediator.Application.Queries;
 using Meeeeeediator.Core;
 using Meeeeeediator.Core.Interfaces;
-using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Meeeeeediator.Application.Post.Queries;
 using Newtonsoft.Json;
 using Xunit;
 
 namespace Meeeeeediator.IntegrationTests
 {
-    public class BasicTests : IClassFixture<WebApplicationFactory<Startup>>
+    public class BasicTests : IClassFixture<CustomWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory _factory;
 
-        public BasicTests(WebApplicationFactory<Startup> factory)
+        public BasicTests(CustomWebApplicationFactory factory)
         {
             _factory = factory;
+        }
+
+        [Fact]
+        public async Task PostQueryReturnsSuccessfully()
+        {
+            var proxyMediator = CreateProxyMediator();
+
+            int postId = 1;
+
+            var response = await proxyMediator.SendAsync(new PostQuery(postId));
+
+            Assert.NotNull(response);
+
+            Assert.Equal(postId, response.Id);
+        }
+
+        [Fact]
+        public async Task PostsQueryReturnsSuccessfully()
+        {
+            var proxyMediator = CreateProxyMediator();
+
+            var response = await proxyMediator.SendAsync(new PostsQuery());
+
+            Assert.NotNull(response);
+
+            Assert.True(response.Any());
         }
 
         [Fact]

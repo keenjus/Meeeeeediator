@@ -5,6 +5,7 @@ namespace Meeeeeediator.Application.Post.DataAccess
 {
     public interface IPostFetcher
     {
-        Task<ICollection<Post>> GetPosts();
+        Task<Post> GetById(int id);
+        Task<ICollection<Post>> GetAll();
     }
 }
