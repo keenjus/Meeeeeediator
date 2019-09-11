@@ -10,17 +10,17 @@ using Xunit;
 
 namespace Meeeeeediator.IntegrationTests
 {
-    public class BasicTests : IClassFixture<CustomWebApplicationFactory>
+    public class ProxyMediatorTests : IClassFixture<CustomWebApplicationFactory>
     {
         private readonly CustomWebApplicationFactory _factory;
 
-        public BasicTests(CustomWebApplicationFactory factory)
+        public ProxyMediatorTests(CustomWebApplicationFactory factory)
         {
             _factory = factory;
         }
 
         [Fact]
-        public async Task PostQueryReturnsSuccessfully()
+        public async Task PostQuery_Returns_Successfully()
         {
             var proxyMediator = CreateProxyMediator();
 
@@ -34,7 +34,7 @@ namespace Meeeeeediator.IntegrationTests
         }
 
         [Fact]
-        public async Task PostsQueryReturnsSuccessfully()
+        public async Task PostsQuery_Returns_Successfully()
         {
             var proxyMediator = CreateProxyMediator();
 
@@ -46,7 +46,7 @@ namespace Meeeeeediator.IntegrationTests
         }
 
         [Fact]
-        public async Task EchoQueryReturnsSuccessfully()
+        public async Task EchoQuery_Returns_Successfully()
         {
             var proxyMediator = CreateProxyMediator();
 
@@ -58,7 +58,7 @@ namespace Meeeeeediator.IntegrationTests
         }
 
         [Fact]
-        public async Task DuplicateEchoQueryReturnsSuccessfully()
+        public async Task Duplicate_EchoQuery_Returns_Successfully()
         {
             var proxyMediator = CreateProxyMediator();
 
@@ -71,11 +71,11 @@ namespace Meeeeeediator.IntegrationTests
         }
 
         [Fact]
-        public async Task DynamicObjectQueryReturnsSuccessfully()
+        public async Task Dynamic_EchoQuery_Returns_Successfully()
         {
             var proxyMediator = CreateProxyMediator();
 
-            string inputMessage = "hello world. is this uppercase?";
+            string inputMessage = "hello world?";
             string expected = inputMessage.ToUpperInvariant();
 
             var response = await proxyMediator.SendAsync((object)new Application.EchoQuery(inputMessage));
@@ -84,11 +84,11 @@ namespace Meeeeeediator.IntegrationTests
         }
 
         [Fact]
-        public async Task DynamicJsonifiedQueryReturnsSuccessfully()
+        public async Task Dynamic_Jsonified_EchoQuery_Returns_Successfully()
         {
             var proxyMediator = CreateProxyMediator();
 
-            string inputMessage = "hello world. is this uppercase?";
+            string inputMessage = "is this uppercase?";
             string expected = inputMessage.ToUpperInvariant();
 
             var response = await proxyMediator.SendAsync("EchoQueryV2", JsonConvert.SerializeObject(new Application.EchoQuery(inputMessage)));
