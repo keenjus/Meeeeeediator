@@ -24,12 +24,12 @@ namespace Meeeeeediator.Client.CLI
                 client.BaseAddress = new Uri("http://localhost:5000");
             });
 
-            serviceCollection.AddSingleton<IProxyMediator, ProxyMediator>(sp => new ProxyMediator(sp.GetRequiredService<IHttpClientFactory>().CreateClient("MediatorApi")));
+            serviceCollection.AddSingleton<IMediator, ProxyMediator>(sp => new ProxyMediator(sp.GetRequiredService<IHttpClientFactory>().CreateClient("MediatorApi")));
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
             #endregion
 
-            var proxyMediator = serviceProvider.GetRequiredService<IProxyMediator>();
+            var proxyMediator = serviceProvider.GetRequiredService<IMediator>();
 
             Console.WriteLine(await proxyMediator.SendAsync(new Application.Queries.EchoQuery() { Message = "Hello World" }));
             Console.WriteLine(await proxyMediator.SendAsync(new Application.EchoQuery("is this uppercase")));
