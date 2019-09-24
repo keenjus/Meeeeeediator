@@ -8,7 +8,7 @@ namespace Meeeeeediator.Application.Queries
     {
         public async Task<string> HandleAsync(EchoQuery query)
         {
-            await Task.Run(() => Thread.Sleep(1000));
+            await Task.Run(() => Thread.Sleep(900));
 
             return query.Message;
         }
