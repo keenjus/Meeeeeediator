@@ -18,7 +18,7 @@ namespace Meeeeeediator.Core.DependencyInjection.Microsoft
             {
                 // Make sure the found type implements IQuery<>
                 var queryInterfaces = type.GetInterfaces().Where(x => x.IsGenericType).Select(x => x.GetGenericTypeDefinition());
-                if (queryInterfaces.Any(x => x == typeof(IQuery<>)))
+                if (queryInterfaces.Any(i => i == typeof(IQuery<>)))
                 {
                     string name = QueryHelper.GetQueryName(type);
                     queryTypeDictionary.Add(name, type);
@@ -43,11 +43,9 @@ namespace Meeeeeediator.Core.DependencyInjection.Microsoft
 
                     var queryHandlerType = typeof(IQueryHandler<,>);
                     var typeDefinition = @interface.GetGenericTypeDefinition();
-                    if (@typeDefinition == queryHandlerType)
-                    {
-                        var genericTypes = @interface.GetGenericArguments();
-                        services.AddScoped(queryHandlerType.MakeGenericType(genericTypes), type);
-                    }
+                    if (@typeDefinition != queryHandlerType) continue;
+
+                    services.AddScoped(@interface, type);
                 }
             }
 

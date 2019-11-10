@@ -1,5 +1,7 @@
 ﻿using Meeeeeediator.Core.Delegates;
+using Meeeeeediator.Core.Helpers;
 using Meeeeeediator.Core.Interfaces;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -15,7 +17,7 @@ namespace Meeeeeediator.Application.Behaviors
 
             sw.Stop();
 
-            System.Console.WriteLine($"Query \"{query.GetType().Name}\" took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Query \"{QueryHelper.GetQueryName<TQuery>()}\" took {sw.ElapsedMilliseconds}ms");
 
             return response;
         }

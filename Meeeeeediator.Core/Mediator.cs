@@ -28,8 +28,7 @@ namespace Meeeeeediator.Core
             var queryType = query.GetType();
 
             var handler = GetHandler(queryType, typeof(TReturn));
-            var handlerDelegate = new QueryHandlerDelegate<TReturn>(() => (Task<TReturn>)GetHandlerResponse(handler, queryType, query));
-
+            var handlerDelegate = GetHandlerDelegate<TReturn>(handler, queryType, query);
             var behaviors = GetBehaviors<TReturn>();
 
             return await behaviors
@@ -78,11 +77,11 @@ namespace Meeeeeediator.Core
             return queryType.GetInterfaces().Single(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQuery<>));
         }
 
-        private static object GetHandlerResponse(object handler, Type queryType, object query)
+        private static QueryHandlerDelegate<TReturn> GetHandlerDelegate<TReturn>(object handler, Type queryType, object query)
         {
             // This seems very hacky, probably overcomplicating it?
             var method = handler.GetType().GetMethod("HandleAsync", new[] { queryType });
-            return method.Invoke(handler, new[] { query });
+            return new QueryHandlerDelegate<TReturn>(() => (Task<TReturn>)method.Invoke(handler, new[] { query }));
         }
     }
 }

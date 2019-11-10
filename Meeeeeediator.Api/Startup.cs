@@ -34,7 +34,6 @@ namespace Meeeeeediator.Api
 
             services.AddScoped(typeof(IBehavior<,>), typeof(PerformanceBehavior<,>));
             services.AddScoped(typeof(IBehavior<,>), typeof(LoggingBehavior<,>));
-            services.AddScoped(typeof(IBehavior<,>), typeof(TestBehavior<,>));
 
             services.AddScoped<IPostFetcher>(sp =>
                 new PostFetcher(sp.GetRequiredService<IHttpClientFactory>().CreateClient("General")));

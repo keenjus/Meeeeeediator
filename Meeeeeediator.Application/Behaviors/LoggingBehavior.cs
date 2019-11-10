@@ -1,5 +1,7 @@
 ﻿using Meeeeeediator.Core.Delegates;
+using Meeeeeediator.Core.Helpers;
 using Meeeeeediator.Core.Interfaces;
+using System;
 using System.Threading.Tasks;
 
 namespace Meeeeeediator.Application.Behaviors
@@ -8,11 +10,13 @@ namespace Meeeeeediator.Application.Behaviors
     {
         public async Task<TReturn> HandleAsync(TQuery query, QueryHandlerDelegate<TReturn> next)
         {
-            System.Console.WriteLine($"Executing query \"{query.GetType().Name}\"");
+            string queryName = QueryHelper.GetQueryName<TQuery>();
+
+            Console.WriteLine($"Executing query \"{queryName}\"");
 
             var response = await next();
 
-            System.Console.WriteLine($"Finished query \"{query.GetType().Name}\"");
+            Console.WriteLine($"Finished query \"{queryName}\"");
 
             return response;
         }
