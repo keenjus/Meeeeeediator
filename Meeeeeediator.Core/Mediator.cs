@@ -35,17 +35,18 @@ namespace Meeeeeediator.Core
             return await behaviors
                 // Reverse so the order of registering the behaviors makes sense
                 .Reverse()
-                .Aggregate(handlerDelegate, (next, pipeline) => () => pipeline.HandleAsync(query, next))();
+                .Aggregate(handlerDelegate, (next, pipeline) => () => pipeline.HandleAsync(query, next))()
+                .ConfigureAwait(false);
         }
 
 
-        public Task<object> SendAsync(string name, string query)
+        public async Task<object> SendAsync(string name, string query)
         {
             if (!_queryTypeDictionary.TryGetValue(name, out var queryType))
             {
                 throw new InvalidOperationException($"Invalid query \"{name}\"");
             }
-            return SendAsync(JsonConvert.DeserializeObject(query, queryType), queryType);
+            return await SendAsync(JsonConvert.DeserializeObject(query, queryType), queryType).ConfigureAwait(false);
         }
 
         private async Task<object> SendAsync(object query, Type queryType)

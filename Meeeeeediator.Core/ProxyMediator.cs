@@ -18,23 +18,23 @@ namespace Meeeeeediator.Core
             _client = client;
         }
 
-        public Task<T> SendAsync<T>(IQuery<T> query)
+        public async Task<T> SendAsync<T>(IQuery<T> query)
         {
-            return SendAsync<T>((object)query);
+            return await SendAsync<T>((object)query).ConfigureAwait(false);
         }
 
-        public Task<object> SendAsync(string name, string query)
+        public async Task<object> SendAsync(string name, string query)
         {
-            return SendAsync<object>(name, query);
+            return await SendAsync<object>(name, query).ConfigureAwait(false);
         }
 
         private async Task<T> SendAsync<T>(string name, string query)
         {
             var body = new StringContent(query, Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync($"/query?name={name}", body);
+            var response = await _client.PostAsync($"/query?name={name}", body).ConfigureAwait(false);
 
-            var stream = await response.Content.ReadAsStreamAsync();
+            var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
             using var streamReader = new StreamReader(stream);
             using var jsonTextReader = new JsonTextReader(streamReader);
@@ -45,7 +45,7 @@ namespace Meeeeeediator.Core
         private async Task<T> SendAsync<T>(object query)
         {
             string queryName = QueryHelper.GetQueryName(query.GetType());
-            return await SendAsync<T>(queryName, JsonConvert.SerializeObject(query));
+            return await SendAsync<T>(queryName, JsonConvert.SerializeObject(query)).ConfigureAwait(false);
         }
 
         private class ResponseWrapper<T>
