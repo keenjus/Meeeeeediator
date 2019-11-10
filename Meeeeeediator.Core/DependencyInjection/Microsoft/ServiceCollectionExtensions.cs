@@ -1,9 +1,6 @@
 ﻿using Meeeeeediator.Core.Helpers;
 using Meeeeeediator.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Meeeeeediator.Core.DependencyInjection.Microsoft
@@ -12,18 +9,7 @@ namespace Meeeeeediator.Core.DependencyInjection.Microsoft
     {
         public static IServiceCollection AddMediator(this IServiceCollection services, Assembly assembly)
         {
-            var queryTypeDictionary = new Dictionary<string, Type>();
-
-            foreach (var type in assembly.GetTypes().Where(x => x.IsPublic && !x.IsAbstract && !x.IsInterface))
-            {
-                // Make sure the found type implements IQuery<>
-                var queryInterfaces = type.GetInterfaces().Where(x => x.IsGenericType).Select(x => x.GetGenericTypeDefinition());
-                if (queryInterfaces.Any(i => i == typeof(IQuery<>)))
-                {
-                    string name = QueryHelper.GetQueryName(type);
-                    queryTypeDictionary.Add(name, type);
-                }
-            }
+            var queryTypeDictionary = QueryHelper.GetQueryTypes(assembly);
 
             services.AddScoped<IMediator, Mediator>(sp => new Mediator(new MicrosoftDependencyInjectionResolver(sp), queryTypeDictionary));
             services.AddQueryHandlers(assembly);
@@ -33,20 +19,9 @@ namespace Meeeeeediator.Core.DependencyInjection.Microsoft
 
         private static IServiceCollection AddQueryHandlers(this IServiceCollection services, Assembly assembly)
         {
-            foreach (var type in assembly.GetTypes())
+            foreach (var (Interface, Implementation) in QueryHelper.GetQueryHandlers(assembly))
             {
-                if (type.IsAbstract || type.IsInterface) continue;
-
-                foreach (var @interface in type.GetInterfaces())
-                {
-                    if (!@interface.IsGenericType) continue;
-
-                    var queryHandlerType = typeof(IQueryHandler<,>);
-                    var typeDefinition = @interface.GetGenericTypeDefinition();
-                    if (@typeDefinition != queryHandlerType) continue;
-
-                    services.AddScoped(@interface, type);
-                }
+                services.AddScoped(Interface, Implementation);
             }
 
             return services;
