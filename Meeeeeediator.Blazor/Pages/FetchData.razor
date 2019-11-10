@@ -1,0 +1,44 @@
+﻿@page "/fetchdata"
+
+@using Meeeeeediator.Application.Post
+@using Meeeeeediator.Application.Post.Queries
+@using Meeeeeediator.Core.Interfaces
+@inject IMediator mediator
+
+<h1>Posts</h1>
+
+<p>This component demonstrates fetching data from ProxyMediator.</p>
+
+@if (posts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var post in posts)
+            {
+                <tr>
+                    <td>@post.Id</td>
+                    <td>@post.Title</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    ICollection<Post> posts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        posts = await mediator.SendAsync(new PostsQuery());
+    }
+}

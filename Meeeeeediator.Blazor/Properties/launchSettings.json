@@ -3,24 +3,21 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:39680",
-      "sslPort": 44340
+      "applicationUrl": "http://localhost:58047",
+      "sslPort": 44395
     }
   },
-  "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "query",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Meeeeeediator.Api": {
+    "Meeeeeediator.Blazor": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "query",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
@@ -29,14 +26,14 @@
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/query",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
       "environmentVariables": {
         "ASPNETCORE_URLS": "https://+:443;http://+:80",
-        "ASPNETCORE_HTTPS_PORT": "44341"
+        "ASPNETCORE_HTTPS_PORT": "44396"
       },
-      "httpPort": 39681,
+      "httpPort": 58049,
       "useSSL": true,
-      "sslPort": 44341
+      "sslPort": 44396
     }
   }
 }
