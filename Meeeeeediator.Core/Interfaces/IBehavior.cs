@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Meeeeeediator.Core.Delegates;
+using System.Threading.Tasks;
 
 namespace Meeeeeediator.Core.Interfaces
 {

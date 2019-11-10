@@ -1,4 +1,4 @@
-﻿using Meeeeeediator.Core;
+﻿using Meeeeeediator.Core.Delegates;
 using Meeeeeediator.Core.Interfaces;
 using System.Threading.Tasks;
 

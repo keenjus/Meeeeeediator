@@ -1,12 +1,12 @@
 ﻿using Meeeeeediator.Core.Helpers;
+using Meeeeeediator.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Meeeeeediator.Core.Interfaces;
 
-namespace Meeeeeediator.Core
+namespace Meeeeeediator.Core.DependencyInjection.Microsoft
 {
     public static class ServiceCollectionExtensions
     {
@@ -25,7 +25,7 @@ namespace Meeeeeediator.Core
                 }
             }
 
-            services.AddScoped<IMediator, Mediator>(sp => new Mediator(sp, queryTypeDictionary));
+            services.AddScoped<IMediator, Mediator>(sp => new Mediator(new MicrosoftDependencyInjectionResolver(sp), queryTypeDictionary));
             services.AddQueryHandlers(assembly);
 
             return services;
@@ -37,11 +37,9 @@ namespace Meeeeeediator.Core
             {
                 if (type.IsAbstract || type.IsInterface) continue;
 
-                var interfaces = type.GetInterfaces();
-
-                foreach (var @interface in interfaces)
+                foreach (var @interface in type.GetInterfaces())
                 {
-                    if (!(@interface.IsGenericType)) continue;
+                    if (!@interface.IsGenericType) continue;
 
                     var queryHandlerType = typeof(IQueryHandler<,>);
                     var typeDefinition = @interface.GetGenericTypeDefinition();

@@ -1,21 +1,23 @@
-﻿using Meeeeeediator.Core.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Meeeeeediator.Core.Delegates;
+using Meeeeeediator.Core.DependencyInjection;
+using Meeeeeediator.Core.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Meeeeeediator.Core
 {
-    public delegate Task<TReturn> QueryHandlerDelegate<TReturn>();
-
     public class Mediator : IMediator
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceResolver _services;
         private readonly IDictionary<string, Type> _queryTypeDictionary;
 
-        public Mediator(IServiceProvider services, IDictionary<string, Type> queryTypeDictionary)
+        private static readonly MethodInfo _sendAsyncMethod = typeof(Mediator).GetMethods().Single(m => m.Name == nameof(SendAsync) && m.IsGenericMethodDefinition);
+
+        public Mediator(IServiceResolver services, IDictionary<string, Type> queryTypeDictionary)
         {
             _services = services;
             _queryTypeDictionary = queryTypeDictionary;
@@ -36,21 +38,9 @@ namespace Meeeeeediator.Core
                 .Aggregate(handlerDelegate, (next, pipeline) => () => pipeline.HandleAsync(query, next))();
         }
 
-        public async Task<object> SendAsync(object query)
+        public Task<object> SendAsync(object query)
         {
-            var queryType = query.GetType();
-
-            var queryInterface = queryType.GetInterfaces()[0];
-            var queryReturnType = queryInterface.GetGenericArguments()[0];
-
-            var handler = GetHandler(queryType, queryReturnType);
-            var handlerDelegate = new QueryHandlerDelegate<object>(async () => {
-                var task = (Task)GetHandlerResponse(handler, queryType, query);
-                await task.ConfigureAwait(false);
-                return (object)((dynamic)task).Result;
-            });
-
-            return await handlerDelegate();
+            return SendAsync(query, query.GetType());
         }
 
         public Task<object> SendAsync(string name, string query)
@@ -59,20 +49,36 @@ namespace Meeeeeediator.Core
             {
                 throw new InvalidOperationException($"Invalid query \"{name}\"");
             }
+            return SendAsync(JsonConvert.DeserializeObject(query, queryType), queryType);
+        }
 
-            var actualQuery = JsonConvert.DeserializeObject(query, queryType);
-            return SendAsync(actualQuery);
+        private async Task<object> SendAsync(object query, Type queryType)
+        {
+            var queryInterface = GetQueryInterface(queryType);
+            var queryReturnType = queryInterface.GetGenericArguments()[0];
+
+            var method = _sendAsyncMethod.MakeGenericMethod(queryReturnType);
+            var task = (Task)method.Invoke(this, new[] { query });
+
+            await task.ConfigureAwait(false);
+
+            return (object)((dynamic)task).Result;
         }
 
         private ICollection<IBehavior<IQuery<TReturn>, TReturn>> GetBehaviors<TReturn>()
         {
-            return _services.GetService<IEnumerable<IBehavior<IQuery<TReturn>, TReturn>>>().ToList();
+            return _services.Resolve<IEnumerable<IBehavior<IQuery<TReturn>, TReturn>>>().ToList();
         }
 
         private object GetHandler(Type queryType, Type returnType)
         {
             var handlerType = typeof(IQueryHandler<,>).MakeGenericType(queryType, returnType);
-            return _services.GetRequiredService(handlerType);
+            return _services.Resolve(handlerType);
+        }
+
+        private static Type GetQueryInterface(Type queryType)
+        {
+            return queryType.GetInterfaces().Single(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQuery<>));
         }
 
         private static object GetHandlerResponse(object handler, Type queryType, object query)

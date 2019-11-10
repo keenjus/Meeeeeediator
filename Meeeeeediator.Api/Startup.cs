@@ -2,7 +2,7 @@ using Meeeeeediator.Api.InputFormatters;
 using Meeeeeediator.Application.Behaviors;
 using Meeeeeediator.Application.Post.DataAccess;
 using Meeeeeediator.Application.Queries;
-using Meeeeeediator.Core;
+using Meeeeeediator.Core.DependencyInjection.Microsoft;
 using Meeeeeediator.Core.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
