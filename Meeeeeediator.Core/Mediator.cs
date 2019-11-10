@@ -38,10 +38,6 @@ namespace Meeeeeediator.Core
                 .Aggregate(handlerDelegate, (next, pipeline) => () => pipeline.HandleAsync(query, next))();
         }
 
-        public Task<object> SendAsync(object query)
-        {
-            return SendAsync(query, query.GetType());
-        }
 
         public Task<object> SendAsync(string name, string query)
         {

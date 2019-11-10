@@ -23,11 +23,6 @@ namespace Meeeeeediator.Core
             return SendAsync<T>((object)query);
         }
 
-        public Task<object> SendAsync(object query)
-        {
-            return SendAsync<object>(query);
-        }
-
         public Task<object> SendAsync(string name, string query)
         {
             return SendAsync<object>(name, query);

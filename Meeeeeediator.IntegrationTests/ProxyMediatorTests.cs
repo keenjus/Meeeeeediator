@@ -71,19 +71,6 @@ namespace Meeeeeediator.IntegrationTests
         }
 
         [Fact]
-        public async Task Dynamic_EchoQuery_Returns_Successfully()
-        {
-            var proxyMediator = CreateProxyMediator();
-
-            string inputMessage = "hello world?";
-            string expected = inputMessage.ToUpperInvariant();
-
-            var response = await proxyMediator.SendAsync((object)new Application.EchoQuery(inputMessage));
-
-            Assert.Equal(expected, response);
-        }
-
-        [Fact]
         public async Task Dynamic_Jsonified_EchoQuery_Returns_Successfully()
         {
             var proxyMediator = CreateProxyMediator();

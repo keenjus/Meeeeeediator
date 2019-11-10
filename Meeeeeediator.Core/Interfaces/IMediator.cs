@@ -7,7 +7,5 @@ namespace Meeeeeediator.Core.Interfaces
         Task<TReturn> SendAsync<TReturn>(IQuery<TReturn> query);
 
         Task<object> SendAsync(string name, string query);
-
-        Task<object> SendAsync(object query);
     }
 }
