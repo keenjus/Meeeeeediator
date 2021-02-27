@@ -10,7 +10,7 @@ namespace Meeeeeediator.Application.Behaviors
     {
         public async Task<TReturn> HandleAsync(TQuery query, QueryHandlerDelegate<TReturn> next)
         {
-            string queryName = QueryHelper.GetQueryName<TQuery>();
+            string queryName = QueryHelper.GetQueryName(query.GetType());
 
             Console.WriteLine($"Executing query \"{queryName}\"");
 

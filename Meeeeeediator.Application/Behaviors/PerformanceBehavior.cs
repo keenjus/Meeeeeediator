@@ -17,7 +17,7 @@ namespace Meeeeeediator.Application.Behaviors
 
             sw.Stop();
 
-            Console.WriteLine($"Query \"{QueryHelper.GetQueryName<TQuery>()}\" took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"Query \"{QueryHelper.GetQueryName(query.GetType())}\" took {sw.ElapsedMilliseconds}ms");
 
             return response;
         }

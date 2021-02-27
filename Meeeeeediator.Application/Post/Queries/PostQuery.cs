@@ -2,7 +2,7 @@
 
 namespace Meeeeeediator.Application.Post.Queries
 {
-    public class PostQuery : IQuery<Post>
+    public class PostQuery : IQuery<Post>, ICacheable
     {
         public PostQuery(int id)
         {
@@ -10,5 +10,7 @@ namespace Meeeeeediator.Application.Post.Queries
         }
 
         public int Id { get; }
+
+        public string CacheKey => $"{nameof(PostQuery)}-{Id}";
     }
 }

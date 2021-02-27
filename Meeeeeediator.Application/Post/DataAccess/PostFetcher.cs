@@ -1,29 +1,27 @@
-﻿using Newtonsoft.Json;
+﻿using Bogus;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Meeeeeediator.Application.Post.DataAccess
 {
     public class PostFetcher : IPostFetcher
     {
-        private readonly HttpClient _httpClient;
+        private readonly Faker<Post> _faker;
+        private readonly List<Post> _posts;
 
-        public PostFetcher(HttpClient httpClient)
+        public PostFetcher()
         {
-            _httpClient = httpClient;
+            _faker = new Faker<Post>()
+                .RuleFor(x => x.Id, (f, p) => f.UniqueIndex)
+                .RuleFor(x => x.Title, (f, p) => f.Lorem.Sentence())
+                .RuleFor(x => x.Body, (f, p) => f.Lorem.Text());
+
+            _posts = _faker.Generate(20);
         }
 
-        public async Task<Post> GetById(int id)
-        {
-            return (await GetAll()).Single(x => x.Id == id);
-        }
+        public Task<Post> GetById(int id) => Task.FromResult(_posts.Single(x => x.Id == id));
 
-        public async Task<ICollection<Post>> GetAll()
-        {
-            var response = await _httpClient.GetAsync("https://jsonplaceholder.typicode.com/posts");
-            return JsonConvert.DeserializeObject<List<Post>>(await response.Content.ReadAsStringAsync());
-        }
+        public Task<ICollection<Post>> GetAll() => Task.FromResult(_posts as ICollection<Post>);
     }
 }

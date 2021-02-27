@@ -1,6 +1,8 @@
 using Meeeeeediator.Api.InputFormatters;
 using Meeeeeediator.Application.Behaviors;
+using Meeeeeediator.Application.Post;
 using Meeeeeediator.Application.Post.DataAccess;
+using Meeeeeediator.Application.Post.Queries;
 using Meeeeeediator.Application.Queries;
 using Meeeeeediator.Core.DependencyInjection.Microsoft;
 using Meeeeeediator.Core.Interfaces;
@@ -9,7 +11,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Net.Http;
+using System;
+using System.Collections.Generic;
 
 namespace Meeeeeediator.Api
 {
@@ -22,7 +25,6 @@ namespace Meeeeeediator.Api
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers(options =>
@@ -30,18 +32,17 @@ namespace Meeeeeediator.Api
                 options.InputFormatters.Insert(0, new RawJsonBodyInputFormatter());
             });
 
-            services.AddHttpClient("General");
-
             services.AddScoped(typeof(IBehavior<,>), typeof(PerformanceBehavior<,>));
             services.AddScoped(typeof(IBehavior<,>), typeof(LoggingBehavior<,>));
+            services.AddScoped(typeof(IBehavior<,>), typeof(CachingBehavior<,>));
 
-            services.AddScoped<IPostFetcher>(sp =>
-                new PostFetcher(sp.GetRequiredService<IHttpClientFactory>().CreateClient("General")));
+            services.AddScoped<IPostFetcher, PostFetcher>();
+
+            services.AddMemoryCache();
 
             services.AddMediator(typeof(EchoQueryHandler).Assembly);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

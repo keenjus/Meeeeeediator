@@ -15,7 +15,8 @@ namespace Meeeeeediator.Core
         private readonly IServiceResolver _services;
         private readonly IDictionary<string, Type> _queryTypeDictionary;
 
-        private static readonly MethodInfo _sendAsyncMethod = typeof(Mediator).GetMethods().Single(m => m.Name == nameof(SendAsync) && m.IsGenericMethodDefinition);
+        private static readonly MethodInfo _sendAsyncMethod = typeof(Mediator)
+            .GetMethods().Single(m => m.Name == nameof(SendAsync) && m.IsGenericMethodDefinition);
 
         public Mediator(IServiceResolver services, IDictionary<string, Type> queryTypeDictionary)
         {
@@ -29,7 +30,7 @@ namespace Meeeeeediator.Core
 
             var handler = GetHandler(queryType, typeof(TReturn));
             var handlerDelegate = GetHandlerDelegate<TReturn>(handler, queryType, query);
-            var behaviors = GetBehaviors<TReturn>();
+            var behaviors = GetBehaviors<TReturn>(queryType);
 
             return await behaviors
                 // Reverse so the order of registering the behaviors makes sense
@@ -45,6 +46,7 @@ namespace Meeeeeediator.Core
             {
                 throw new InvalidOperationException($"Invalid query \"{name}\"");
             }
+
             return await SendAsync(JsonConvert.DeserializeObject(query, queryType), queryType).ConfigureAwait(false);
         }
 
@@ -61,7 +63,7 @@ namespace Meeeeeediator.Core
             return (object)((dynamic)task).Result;
         }
 
-        private ICollection<IBehavior<IQuery<TReturn>, TReturn>> GetBehaviors<TReturn>()
+        private ICollection<IBehavior<IQuery<TReturn>, TReturn>> GetBehaviors<TReturn>(Type queryType)
         {
             return _services.Resolve<IEnumerable<IBehavior<IQuery<TReturn>, TReturn>>>().ToList();
         }
@@ -80,7 +82,9 @@ namespace Meeeeeediator.Core
         private static QueryHandlerDelegate<TReturn> GetHandlerDelegate<TReturn>(object handler, Type queryType, object query)
         {
             // This seems very hacky, probably overcomplicating it?
-            var method = handler.GetType().GetMethod("HandleAsync", new[] { queryType });
+            var method = handler.GetType()
+                .GetMethod(nameof(IQueryHandler<IQuery<object>, object>.HandleAsync), new[] { queryType });
+
             return new QueryHandlerDelegate<TReturn>(() => (Task<TReturn>)method.Invoke(handler, new[] { query }));
         }
     }
